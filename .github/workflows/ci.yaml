@@ -1,0 +1,53 @@
+name: CI
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup V
+        run: |
+          wget -qO /tmp/v.zip https://github.com/vlang/v/releases/latest/download/v_linux.zip
+          unzip -q /tmp/v.zip -d /tmp
+          echo /tmp/v >> "$GITHUB_PATH"
+
+      - name: Run tests
+        run: v -stats test .
+
+      - name: Build docs
+        run: |
+          v doc -f html -m .
+          pushd _docs
+          ln -vs netaddr.html index.html
+          ls -alFh
+          popd
+
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _docs/
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
