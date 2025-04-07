@@ -265,3 +265,9 @@ println(ip) // 2001:db8::8429:6bff:fedc:ef8b
 
 Note that using EUI in IPv6 address may cause security issues. See
 [RFC 4941](https://datatracker.ietf.org/doc/html/rfc4941) for details.
+
+# License
+
+`netaddr` is released under LGPL 3.0 or later license.
+
+SPDX Lincese ID: `LGPL-3.0-or-later`.
