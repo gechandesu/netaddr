@@ -46,7 +46,7 @@ fn main() {
 	if ip is netaddr.Ipv4Net || ip is netaddr.Ipv6Net {
 		panic('${ip} seems to be network, not a single host addresses')
 	}
-	println(addr)
+	println(ip)
 }
 ```
 
