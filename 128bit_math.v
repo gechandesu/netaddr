@@ -14,14 +14,15 @@
 // along with netaddr. If not, see <https://www.gnu.org/licenses/>.
 
 /*
-	This file contains functions for operating with big endian ordered byte arrays.
-	Using big.Integer is significantly slower than doing math strictly on 128-bit
-	numbers. At a minimum, you have to do expensive instantiation of big.Integer.
-	The functions below do not require copying arrays and allocate less memory.
+	This file contains functions for operating with 128-bit unsigned integer
+	numbers represented as big endian ordered byte fixed size arrays.
+	Note that arrays always be 16 byte length and may contain leading zeros.
 
-	Functions missing:
-		fn add_128(a [16]u8, b [16]u8) [16]u8
-		fn diff_128(a [16]u8, b [16]u8) [16]u8
+	Using V math.big is significantly slower than doing math strictly on
+	128-bit numbers. At a minimum, you have to do expensive instantiation of
+	big.Integer.
+
+	The functions below do not requires copying and allocates less memory.
 */
 
 module netaddr
@@ -29,6 +30,39 @@ module netaddr
 import math.bits
 
 const max_128 = [16]u8{init: 0xff}
+const one_128 = [u8(0), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]!
+
+@[direct_array_access; inline]
+fn add_128(a [16]u8, b [16]u8) [16]u8 {
+	mut res := [16]u8{}
+	mut num := u16(0)
+	for i := 15; i >= 0; i-- {
+		num += u16(a[i])
+		num += u16(b[i])
+		res[i] += u8(num % 256)
+		num /= 256
+	}
+	if num > 0 {
+		panic('128 bit overflow detected')
+	}
+	return res
+}
+
+@[direct_array_access; inline]
+fn sub_128(a [16]u8, b [16]u8) [16]u8 {
+	mut res := [16]u8{}
+	mut borrowed := u8(0)
+	for i := 15; i >= 0; i-- {
+		if a[i] < b[i] {
+			res[i] = (a[i] + 256) - borrowed - b[i]
+			borrowed = 1
+		} else {
+			res[i] = a[i] - borrowed - b[i]
+			borrowed = 0
+		}
+	}
+	return res
+}
 
 @[direct_array_access; inline]
 fn bit_len_128(a [16]u8) int {
