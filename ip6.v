@@ -514,7 +514,7 @@ pub:
 	host_address      ?Ipv6Addr
 	prefix_len        int
 mut:
-	current big.Integer
+	current [16]u8
 }
 
 // Ipv6Net.new creates new IPv6 network from given Ipv6Addr and prefix.
@@ -548,7 +548,7 @@ pub fn Ipv6Net.new(addr Ipv6Addr, prefix int) !Ipv6Net {
 		broadcast_address: broadcast
 		host_address:      host_addr
 		prefix_len:        prefix
-		current:           net_addr.bigint()
+		current:           net_addr.u8_array_fixed()
 	}
 }
 
@@ -617,7 +617,7 @@ pub fn Ipv6Net.from_string(cidr string) !Ipv6Net {
 		broadcast_address: broadcast
 		host_address:      host_addr
 		prefix_len:        prefix_len
-		current:           net_addr.bigint()
+		current:           net_addr.u8_array_fixed()
 	}
 }
 
@@ -639,14 +639,15 @@ pub fn Ipv6Net.from_bigint(addr big.Integer, prefix int) !Ipv6Net {
 	}
 	host_mask := net_mask.bitwise_xor(max_u128)
 	broadcast := net_addr.bitwise_or(host_mask)
+	net_addr6 := Ipv6Addr.from_bigint(net_addr)!
 	return Ipv6Net{
-		network_address:   Ipv6Addr.from_bigint(net_addr)!
+		network_address:   net_addr6
 		network_mask:      Ipv6Addr.from_bigint(net_mask)!
 		host_mask:         Ipv6Addr.from_bigint(host_mask)!
 		broadcast_address: Ipv6Addr.from_bigint(broadcast)!
 		host_address:      host_addr
 		prefix_len:        prefix
-		current:           net_addr
+		current:           net_addr6.u8_array_fixed()
 	}
 }
 
@@ -689,13 +690,15 @@ pub fn (n Ipv6Net) capacity() big.Integer {
 // }
 // ```
 pub fn (mut n Ipv6Net) next() ?Ipv6Addr {
-	if n.current >= n.broadcast_address.bigint() + big.one_int {
+	// Possible optimization: do not calculate `limit` on each fn call (use LRU cache?)
+	limit := add_128(n.broadcast_address.addr, one_128)
+	if compare_128(n.current, limit) in [0, 1] {
 		return none
 	}
 	defer {
-		n.current = n.current + big.one_int
+		n.current = add_128(n.current, one_128)
 	}
-	return Ipv6Addr.from_bigint(n.current)!
+	return Ipv6Addr.from_octets(n.current)!
 }
 
 // first returns the first usable host address in network.
@@ -703,7 +706,7 @@ pub fn (n Ipv6Net) first() Ipv6Addr {
 	if n.prefix_len in [127, 128] {
 		return n.network_address
 	}
-	return Ipv6Addr.from_bigint(n.network_address.bigint() + big.one_int) or { panic(err) }
+	return Ipv6Addr.from_octets(add_128(n.network_address.addr, one_128)) or { panic(err) }
 }
 
 // last returns the last usable host address in network.
@@ -711,7 +714,7 @@ pub fn (n Ipv6Net) last() Ipv6Addr {
 	if n.prefix_len in [127, 128] {
 		return n.broadcast_address
 	}
-	return Ipv6Addr.from_bigint(n.broadcast_address.bigint() - big.one_int) or { panic(err) }
+	return Ipv6Addr.from_octets(sub_128(n.broadcast_address.addr, one_128)) or { panic(err) }
 }
 
 // nth returns the Nth address in network. Supports negative indexes.

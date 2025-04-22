@@ -185,6 +185,12 @@ fn test_ipv6_net_format() {
 	assert net.format(.verbose | .with_host_mask) == 'fe80:ffff:0000:0000:0000:0000:0000:0000/0000:0000:0000:0000:ffff:ffff:ffff:ffff'
 }
 
+fn test_ipv6_net_first_last() {
+	net := netaddr.Ipv6Net.from_string('fe80:ffff::/64')!
+	assert net.first().str() == 'fe80:ffff::1'
+	assert net.last().str() == 'fe80:ffff::ffff:ffff:ffff:fffe'
+}
+
 fn test_ipv6_net_next() {
 	net := netaddr.Ipv6Net.from_string('fe80::/64')!
 	mut addrs := []netaddr.Ipv6Addr{}
