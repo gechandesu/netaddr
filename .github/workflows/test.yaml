@@ -1,4 +1,4 @@
-name: Tests
+name: Lint and test
 on:
   push:
     branches: [ "master" ]
@@ -21,4 +21,7 @@ jobs:
 
       - name: Run tests
         run: |
+          v fmt -verify .
+          v vet -v -W -I -F -r .
+          v missdoc -r --verify .
           v -stats test .
