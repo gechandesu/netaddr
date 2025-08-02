@@ -21,7 +21,7 @@ jobs:
         run: |
           v doc -f html -m .
           pushd _docs
-          ln -vs netaddr.html index.html
+          ln -vs ${{ github.event.repository.name }}.html index.html
           ls -alFh
           popd
 
