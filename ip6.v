@@ -234,8 +234,9 @@ pub fn (a Ipv6Addr) format(fmt Ipv6AddrFormat) string {
 			}
 			if a.zone_id == none {
 				return str.join(':')
+			} else {
+				return str.join(':') + '%' + a.zone_id
 			}
-			return str.join(':') + '%' + (a.zone_id as string)
 		}
 		fmt & .verbose == .verbose {
 			if fmt & .dotted == .dotted {
@@ -253,8 +254,9 @@ pub fn (a Ipv6Addr) format(fmt Ipv6AddrFormat) string {
 			}
 			if a.zone_id == none {
 				return str.join(':')
+			} else {
+				return str.join(':') + '%' + a.zone_id
 			}
-			return str.join(':') + '%' + (a.zone_id as string)
 		}
 		else {
 			return a.str()
@@ -459,8 +461,7 @@ pub:
 
 fn (p Ipv6AddrParams) validate() ! {
 	if p.zone_id != none {
-		zone_id := p.zone_id as string
-		if zone_id.is_blank() || zone_id.contains('%') {
+		if p.zone_id.is_blank() || p.zone_id.contains('%') {
 			return error('zone_id cannot be blank or contain % sign')
 		}
 	}

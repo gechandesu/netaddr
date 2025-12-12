@@ -196,8 +196,7 @@ if available. For example (V REPL session):
 fe80::d08e:6658:38bd:6391%wlan0
 >>> ip6_scoped.zone_id
 Option('wlan0')
->>> zone_id := ip6_scoped.zone_id as string
->>> zone_id
+>>> ip6_scoped.zone_id?
 wlan0
 ```
 
