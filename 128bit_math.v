@@ -54,7 +54,7 @@ fn sub_128(a [16]u8, b [16]u8) [16]u8 {
 	mut borrowed := u8(0)
 	for i := 15; i >= 0; i-- {
 		if a[i] < b[i] {
-			res[i] = (a[i] + 256) - borrowed - b[i]
+			res[i] = u8((a[i] + 256) - borrowed - b[i])
 			borrowed = 1
 		} else {
 			res[i] = a[i] - borrowed - b[i]
