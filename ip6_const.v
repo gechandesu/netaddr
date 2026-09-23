@@ -25,7 +25,10 @@ struct Ipv6Const {
 
 fn (n Ipv6Const) contains(addr Ipv6Addr) bool {
 	// There is: n.begin <= addr && addr <= n.end
-	return compare_128(n.begin, addr.addr) in [-1, 0] && compare_128(addr.addr, n.end) in [-1, 0]
+	return compare_128(n.begin, addr.addr) in [-1, 0] && compare_128(addr.addr, n.end) in [
+		-1,
+		0,
+	]
 }
 
 // fec0::/10

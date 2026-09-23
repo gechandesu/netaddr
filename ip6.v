@@ -357,7 +357,8 @@ pub fn (a Ipv6Addr) is_ipv4_mapped() bool {
 // Note: loopback and unspecified addresses (::1 and :: respectively) are not
 // recognized as IPv4-compatible addresses.
 pub fn (a Ipv6Addr) is_ipv4_compat() bool {
-	return a.addr[..12].all(it == u8(0)) && a.addr[12..16] !in [[u8(0), 0, 0, 0], [u8(0), 0, 0, 1]]
+	return a.addr[..12].all(it == u8(0)) && a.addr[12..16] !in [[u8(0), 0, 0, 0], [u8(0), 0, 0,
+		1]]
 }
 
 // is_site_local returns true if the address is reserved for site local usage.
