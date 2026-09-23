@@ -259,7 +259,7 @@ pub fn (a Ipv6Addr) format(fmt Ipv6AddrFormat) string {
 			}
 		}
 		else {
-			return a.str()
+			return a.format(.compact | .dotted)
 		}
 	}
 }
@@ -699,7 +699,7 @@ pub fn (mut n Ipv6Net) next() ?Ipv6Addr {
 	defer {
 		n.current = add_128(n.current, one_128)
 	}
-	return Ipv6Addr.from_octets(n.current)!
+	return Ipv6Addr.from_octets(n.current) or { panic('unreachable') }
 }
 
 // first returns the first usable host address in network.
@@ -884,5 +884,5 @@ pub fn (mut iter Ipv6NetsIterator) next() ?Ipv6Net {
 	defer {
 		iter.current += iter.step
 	}
-	return Ipv6Net.from_bigint(iter.current, iter.prefix_len)!
+	return Ipv6Net.from_bigint(iter.current, iter.prefix_len) or { panic('unreachanbe') }
 }
