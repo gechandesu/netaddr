@@ -259,7 +259,7 @@ pub fn (a Ipv6Addr) format(fmt Ipv6AddrFormat) string {
 			}
 		}
 		else {
-			return a.str()
+			return a.format(.compact | .dotted)
 		}
 	}
 }
@@ -357,7 +357,8 @@ pub fn (a Ipv6Addr) is_ipv4_mapped() bool {
 // Note: loopback and unspecified addresses (::1 and :: respectively) are not
 // recognized as IPv4-compatible addresses.
 pub fn (a Ipv6Addr) is_ipv4_compat() bool {
-	return a.addr[..12].all(it == u8(0)) && a.addr[12..16] !in [[u8(0), 0, 0, 0], [u8(0), 0, 0, 1]]
+	return a.addr[..12].all(it == u8(0)) && a.addr[12..16] !in [[u8(0), 0, 0, 0], [u8(0), 0, 0,
+		1]]
 }
 
 // is_site_local returns true if the address is reserved for site local usage.
@@ -699,7 +700,7 @@ pub fn (mut n Ipv6Net) next() ?Ipv6Addr {
 	defer {
 		n.current = add_128(n.current, one_128)
 	}
-	return Ipv6Addr.from_octets(n.current)!
+	return Ipv6Addr.from_octets(n.current) or { panic('unreachable') }
 }
 
 // first returns the first usable host address in network.
@@ -884,5 +885,5 @@ pub fn (mut iter Ipv6NetsIterator) next() ?Ipv6Net {
 	defer {
 		iter.current += iter.step
 	}
-	return Ipv6Net.from_bigint(iter.current, iter.prefix_len)!
+	return Ipv6Net.from_bigint(iter.current, iter.prefix_len) or { panic('unreachanbe') }
 }

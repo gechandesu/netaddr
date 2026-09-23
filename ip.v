@@ -543,5 +543,5 @@ pub fn (mut iter Ipv4NetsIterator) next() ?Ipv4Net {
 	defer {
 		iter.current += iter.step
 	}
-	return Ipv4Net.from_u32(iter.current, iter.prefix_len)!
+	return Ipv4Net.from_u32(iter.current, iter.prefix_len) or { panic('unreachable') }
 }

@@ -25,7 +25,10 @@ struct Ipv6Const {
 
 fn (n Ipv6Const) contains(addr Ipv6Addr) bool {
 	// There is: n.begin <= addr && addr <= n.end
-	return compare_128(n.begin, addr.addr) in [-1, 0] && compare_128(addr.addr, n.end) in [-1, 0]
+	return compare_128(n.begin, addr.addr) in [-1, 0] && compare_128(addr.addr, n.end) in [
+		-1,
+		0,
+	]
 }
 
 // fec0::/10
@@ -166,7 +169,7 @@ const ipv6_reserved_networks = [
 		end:   [u8(0xfe), 0x7f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 			0xff, 0xff, 0xff]!
 	},
-]!
+] // FIXME: This constant array must have a fixed size, see https://github.com/vlang/v/issues/28900
 
 const ipv6_private_networks = [
 	// ::1/128
@@ -246,7 +249,7 @@ const ipv6_private_networks = [
 		end:   [u8(0xfe), 0xbf, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 			0xff, 0xff, 0xff]!
 	},
-]!
+] // FIXME: This constant array must have a fixed size, see https://github.com/vlang/v/issues/28900
 
 const ipv6_private_networks_exceptions = [
 	// 2001:1::1/128
@@ -291,4 +294,4 @@ const ipv6_private_networks_exceptions = [
 		end:   [u8(0x20), 0x01, 0x00, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 			0xff, 0xff, 0xff]!
 	},
-]!
+] // FIXME: This constant array must have a fixed size, see https://github.com/vlang/v/issues/28900
