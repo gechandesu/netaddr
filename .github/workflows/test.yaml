@@ -11,13 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup V
         run: |
-          wget -qO /tmp/v.zip https://github.com/vlang/v/releases/latest/download/v_linux.zip
-          unzip -q /tmp/v.zip -d /tmp
-          echo /tmp/v >> "$GITHUB_PATH"
+          git clone --depth=1 https://github.com/vlang/v /tmp/v && cd /tmp/v && make
+          /tmp/v/v symlink
 
       - name: Run tests
         run: |
