@@ -9,16 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup V
         run: |
-          wget -qO /tmp/v.zip https://github.com/vlang/v/releases/latest/download/v_linux.zip
-          unzip -q /tmp/v.zip -d /tmp
-          echo /tmp/v >> "$GITHUB_PATH"
+          git clone --depth=1 https://github.com/vlang/v /tmp/v && cd /tmp/v && make
+          /tmp/v/v symlink
 
       - name: Build docs
         run: |
+          v missdoc -r --verify .
           v doc -f html -m .
           pushd _docs
           ln -vs ${{ github.event.repository.name }}.html index.html
@@ -27,7 +27,7 @@ jobs:
 
       - name: Upload static files as artifact
         id: deployment
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _docs/
 
@@ -40,7 +40,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
 permissions:
   contents: read
